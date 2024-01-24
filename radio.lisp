@@ -86,8 +86,7 @@
 
 (defun vswr-to-percentage-loss (vswr)
   "Given a VSWR, return the loss in percentage."
-  (if (or (equal 0 vswr)
-	  (equal 0.0 vswr))
+  (if (<= vswr 1.0)
       0
       (- 100
 	 (* 100
