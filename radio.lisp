@@ -2,6 +2,11 @@
 
 (in-package #:radio)
 
+;;; Just for giggles, let's join the 21st Century.
+(setf *read-default-float-format* 'double-float)
+
+(defparameter *c* 299792458)
+
 (defun watts-to-milliwatts (watts)
   "Given watts, returns the equivalent number of milliwatts."
   (* 1000 watts))
@@ -91,6 +96,24 @@
       (- 100
 	 (* 100
 	    (calc-watts-with-db-gain 1.0 (- 0 (vswr-to-mismatch-loss-db vswr)))))))
+
+(defun tdr-length-meters (nanoseconds-round-trip &optional (velocity-factor (/ 2 3)))
+  "Given the elapsed round-trip time in nanoseconds and a coax velocity factor (defaults to 0.67), return the coax length in meters."
+  (* (/ *c* 1000000000) nanoseconds-round-trip 0.5 velocity-factor))
+
+(defun tdr-length-feet (nanoseconds-round-trip &optional (velocity-factor (/ 2 3)))
+  "Given the elapsed round-trip time in nanoseconds and a coax velocity factor (defaults to 0.67), return the coax length in feet."
+  (* 3.281 (tdr-length-meters nanoseconds-round-trip velocity-factor)))
+
+(defun tdr-velocity-factor-given-meters (nanoseconds-round-trip meters-length)
+  "Given the elapsed round-trip time in nanonseconds and the length of the coax in meters, return the velocity factor."
+  (when (> nanoseconds-round-trip 0)
+    (* (/ (* 2 meters-length) nanoseconds-round-trip *c*) 1000000000)))
+
+(defun tdr-velocity-factor-given-feet (nanoseconds-round-trip feet-length)
+  "Given the elapsed round-trip time in nanonseconds and the length of the coax in feet, return the velocity factor."
+  (when (> nanoseconds-round-trip 0)
+    (tdr-velocity-factor-given-meters nanoseconds-round-trip (/ feet-length 3.281))))
 
 ;;; Local Variables:
 ;;; mode: Lisp

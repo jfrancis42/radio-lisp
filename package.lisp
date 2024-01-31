@@ -23,4 +23,8 @@
 	   :return-loss-db-to-mismatch-loss-db
 	   :vswr-to-mismatch-loss-db
 	   :vswr-to-percentage-loss
+	   :tdr-length-meters
+	   :tdr-length-feet
+	   :tdr-velocity-factor-given-meters
+	   :tdr-velocity-factor-given-feet
 	   ))
