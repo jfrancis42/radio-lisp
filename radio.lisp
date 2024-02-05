@@ -115,6 +115,103 @@
   (when (> nanoseconds-round-trip 0)
     (tdr-velocity-factor-given-meters nanoseconds-round-trip (/ feet-length 3.281))))
 
+(defun closest-standard-resistor (ohms)
+  "Return the value of the closest standard resistor in ohms."
+  (first
+   (sort (list 0 220 330 470 680 1000 1500 2200 3300 4700 6800
+	       10000 15000 22000 33000 47000 68000 100000 220000
+	       470000 1000000)
+	 (lambda (a b) (< (abs (- a ohms)) (abs (- b ohms)))))))
+
+(defun closest-standard-capacitor (uf)
+  "Return the value of the closest standard capacitor in uf."
+  (first
+   (sort (list 0.000010 0.0000020 0.000047 0.000100 0.000150
+	       0.000220 0.000330 0.000470 0.000680 0.001 0.0022
+	       0.0033 0.0047 0.0068 0.010 0.022 0.033 0.047
+	       0.068 0.100 0.220 0.470 1 10)
+	 (lambda (a b) (< (abs (- a uf)) (abs (- b uf)))))))
+
+(defun f-to-uf (c)
+  "Convert from farads to microfarads."
+  (* c 1000000))
+
+(defun uf-to-f (c)
+  "Convert from microfarads to farads."
+  (/ c 1000000))
+
+(defun f-to-nf (c)
+  "Convert from farads to nanofarads."
+  (* c 1000000000))
+
+(defun nf-to-f (c)
+  "Convert from nanofarads to farads."
+  (/ c 1000000000))
+
+(defun f-to-pf (c)
+  "Convert from farads to picofarads."
+  (* c 1000000000000))
+
+(defun pf-to-f (c)
+  "Convert from picofarads to farads."
+  (/ c 1000000000000))
+
+(defun stage (which of)
+  "From the ARRL Handbook. Factor 'a' for low- and high-pass filters."
+  (nth (- which 1)
+       (nth (- of 1)
+	    (list (list 1.414 nil nil nil)
+		  (list 0.765 1.848 nil nil)
+		  (list 0.518 1.414 1.932 nil)
+		  (list 0.390 1.111 1.663 1.962)))))
+
+(defun arrl-low-pass-af-active-filter (this-stage total-stages
+					gain minus-3db-cutoff-freq)
+  "Calculate the component values for the simple Butterworth AF low-pass active filter in the ARRL Handbook. If gain<=1, omit R3 and bypass R4. Figure 10.32 in the 2021 Handbook, similar in other editions."
+  (let* ((k gain)
+	 (fc minus-3db-cutoff-freq)
+	 (wc (* 2 pi fc))
+	 (a (stage this-stage total-stages))
+	 (b 1)
+	 (c2 (uf-to-f (/ 10.0 fc)))
+	 (c1 (/ (* c2 (+ (expt a 2) (* 4 b (- k 1)))) (* 4 b)))
+	 (r1 (/ 2 (* wc (+ (* a c2)
+			   (sqrt (- (* c2 c2 (+ (* a a) (* 4 (- k 1))))
+				    (* 4 c1 c2)))))))
+	 (r2 (/ 1 (* b c1 c2 r1 (expt wc 2))))
+	 (r3 (when (> k 1)
+	       (/ (* k (+ r1 r2)) (- k 1))))
+	 (r4 (if (> k 1)
+		 (* k (+ r1 r2))
+		 0)))
+    (list (cons :c1 (closest-standard-capacitor (f-to-uf c1)))
+	  (cons :c2 (closest-standard-capacitor (f-to-uf c2)))
+	  (cons :r1 (closest-standard-resistor r1))
+	  (cons :r2 (closest-standard-resistor r2))
+	  (cons :r3 (when (> k 1) (closest-standard-resistor r3)))
+	  (cons :r4 (closest-standard-resistor r4)))))
+
+(defun arrl-high-pass-af-active-filter (this-stage total-stages
+					gain minus-3db-cutoff-freq)
+  "Calculate the component values for the simple Butterworth AF high-pass active filter in the ARRL handbook. If gain<=1, omit R3 and bypass R4. Figure 10.32 in the 2021 Handbook, similar in other editions."
+  (let* ((k gain)
+	 (fc minus-3db-cutoff-freq)
+	 (wc (* 2 pi fc))
+	 (a (stage this-stage total-stages))
+	 (c (uf-to-f (/ 10.0 fc)))
+	 (r1 (/ 4 (* (+ a (sqrt (+ (* a a) (* 8 (- k 1))))) wc c)))
+	 (r2 (/ 1 (* wc wc c c r1)))
+	 (r3 (when (> k 1)
+	       (/ (* k r1) (- k 1))))
+	 (r4 (if (> k 1)
+		 (* k r1)
+		 0)))
+    (list (cons :c (closest-standard-capacitor (f-to-uf c)))
+	  (cons :r1 (closest-standard-resistor r1))
+	  (cons :r2 (closest-standard-resistor r2))
+	  (cons :r3 (when (> k 1) (closest-standard-resistor r3)))
+	  (cons :r4 (closest-standard-resistor r4)))))
+
 ;;; Local Variables:
 ;;; mode: Lisp
 ;;; coding: utf-8

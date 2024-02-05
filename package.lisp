@@ -27,4 +27,14 @@
 	   :tdr-length-feet
 	   :tdr-velocity-factor-given-meters
 	   :tdr-velocity-factor-given-feet
+	   :closest-standard-resistor
+	   :closest-standard-capacitor
+	   :f-to-uf
+	   :uf-to-f
+	   :f-to-nf
+	   :nf-to-f
+	   :f-to-pf
+	   :pf-to-f
+	   :arrl-low-pass-af-active-filter
+	   :arrl-high-pass-af-active-filter
 	   ))
