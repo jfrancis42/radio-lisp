@@ -30,11 +30,17 @@
 	   :closest-standard-resistor
 	   :closest-standard-capacitor
 	   :f-to-uf
-	   :uf-to-f
 	   :f-to-nf
-	   :nf-to-f
 	   :f-to-pf
+	   :uf-to-f
+	   :uf-to-nf
+	   :uf-to-pf
+	   :nf-to-f
+	   :nf-to-uf
+	   :nf-to-pf
 	   :pf-to-f
+	   :pf-to-uf
+	   :pf-to-nf
 	   :arrl-low-pass-af-active-filter
 	   :arrl-high-pass-af-active-filter
 	   ))

@@ -136,25 +136,49 @@
   "Convert from farads to microfarads."
   (* c 1000000))
 
-(defun uf-to-f (c)
-  "Convert from microfarads to farads."
-  (/ c 1000000))
-
 (defun f-to-nf (c)
   "Convert from farads to nanofarads."
   (* c 1000000000))
-
-(defun nf-to-f (c)
-  "Convert from nanofarads to farads."
-  (/ c 1000000000))
 
 (defun f-to-pf (c)
   "Convert from farads to picofarads."
   (* c 1000000000000))
 
+(defun uf-to-f (c)
+  "Convert from microfarads to farads."
+  (/ c 1000000))
+
+(defun uf-to-nf (c)
+  "Convert from microfarads to nanofarads."
+  (f-to-nf (uf-to-f c)))
+
+(defun uf-to-pf (c)
+  "Convert from microfarads to picofarads."
+  (f-to-pf (uf-to-f c)))
+
+(defun nf-to-f (c)
+  "Convert from nanofarads to farads."
+  (/ c 1000000000))
+
+(defun nf-to-uf (c)
+  "Convert from nanofarads to microfarads."
+  (f-to-uf (nf-to-f c)))
+
+(defun nf-to-pf (c)
+  "Convert from nanofarads to picofarads."
+  (f-to-pf (nf-to-f c)))
+
 (defun pf-to-f (c)
   "Convert from picofarads to farads."
   (/ c 1000000000000))
+
+(defun pf-to-uf (c)
+  "Convert from picofarads to microfarads."
+  (f-to-uf (pf-to-f c)))
+
+(defun pf-to-nf (c)
+  "Convert from picofarads to nanofarads."
+  (f-to-nf (pf-to-f c)))
 
 (defun stage (which of)
   "From the ARRL Handbook. Factor 'a' for low- and high-pass filters."
