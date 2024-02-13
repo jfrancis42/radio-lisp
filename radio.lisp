@@ -39,6 +39,12 @@
   "Given a power in watts and a gain (-loss) in dB, returns the value."
   (* watts-in (expt 10 (/ db 10))))
 
+(defun vpeak-to-vpkpk (v-peak)
+  (* v-peak 2))
+
+(defun vpkpk-to-vpeak (v-pkpk)
+  (/ v-pkpk 2))
+
 (defun vpeak-to-vrms (v-peak)
   "Convert peak voltage to RMS voltage."
   (* (/ 1 (sqrt 2)) v-peak))
@@ -66,6 +72,10 @@
 (defun vpkpk-to-watts (v-pkpk)
   "Given a peak-to-peak voltage as a sine wave into a 50 ohm load, return the number of watts."
   (/ (* v-pkpk v-pkpk) 400))
+
+(defun vpkpk-to-vrms (v-pkpk)
+  "Given a peak-to-peak voltage as a sine wave into a 50 ohm load, return the RMS voltage."
+  (vpeak-to-vrms (vpkpk-to-vpeak v-pkpk)))
 
 (defun watts-to-vpkpk (watts)
   "Given watts as a sine wave into a 50 ohm load, return the peak-to-peak voltage."
@@ -118,9 +128,9 @@
 (defun closest-standard-resistor (ohms)
   "Return the value of the closest standard resistor in ohms."
   (first
-   (sort (list 0 220 330 470 680 1000 1500 2200 3300 4700 6800
-	       10000 15000 22000 33000 47000 68000 100000 220000
-	       470000 1000000)
+   (sort (list 0 1 2.2 3.3 4.7 10 22 47 68 100 150 220 330 470
+	       680 1000 1500 2200 3300 4700 6800 10000 15000
+	       22000 33000 47000 68000 100000 220000 470000 1000000)
 	 (lambda (a b) (< (abs (- a ohms)) (abs (- b ohms)))))))
 
 (defun closest-standard-capacitor (uf)

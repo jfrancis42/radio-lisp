@@ -11,12 +11,15 @@
 	   :calc-db-gain
 	   :calc-watts-with-db-gain
 	   :vpeak-to-vrms
+	   :vpeak-to-vpkpk
+	   :vpkpk-to-vpeak
 	   :vrms-to-vpeak
 	   :vrms-to-watts
 	   :watts-to-vrms
 	   :vpeak-to-watts
 	   :watts-to-vpeak
 	   :vpkpk-to-watts
+	   :vpkpk-to-vrms
 	   :watts-to-vpkpk
 	   :return-loss-db-to-vswr
 	   :vswr-to-return-loss-db
