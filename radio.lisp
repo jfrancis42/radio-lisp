@@ -201,8 +201,12 @@
 		  (list 0.390 1.111 1.663 1.962)))))
 
 (defun arrl-low-pass-af-active-filter (this-stage total-stages
-					gain minus-3db-cutoff-freq)
-  "Calculate the component values for the simple Butterworth AF low-pass active filter in the ARRL Handbook. If gain<=1, omit R3 and bypass R4. Figure 10.32 in the 2021 Handbook, similar in other editions."
+				       gain minus-3db-cutoff-freq
+				       &optional (closest-real t))
+  "Calculate the component values for the simple Butterworth AF low-pass
+active filter in the ARRL Handbook. If gain<=1, omit R3 and bypass
+R4. Defaults to returning commercially available resistor/capactor
+values. Figure 10.32 in the 2021 Handbook, similar in other editions."
   (let* ((k gain)
 	 (fc minus-3db-cutoff-freq)
 	 (wc (* 2 pi fc))
@@ -219,16 +223,27 @@
 	 (r4 (if (> k 1)
 		 (* k (+ r1 r2))
 		 0)))
-    (list (cons :c1 (closest-standard-capacitor (f-to-uf c1)))
-	  (cons :c2 (closest-standard-capacitor (f-to-uf c2)))
-	  (cons :r1 (closest-standard-resistor r1))
-	  (cons :r2 (closest-standard-resistor r2))
-	  (cons :r3 (when (> k 1) (closest-standard-resistor r3)))
-	  (cons :r4 (closest-standard-resistor r4)))))
+    (if closest-real
+	(list (cons :c1 (closest-standard-capacitor (f-to-uf c1)))
+	      (cons :c2 (closest-standard-capacitor (f-to-uf c2)))
+	      (cons :r1 (closest-standard-resistor r1))
+	      (cons :r2 (closest-standard-resistor r2))
+	      (cons :r3 (when (> k 1) (closest-standard-resistor r3)))
+	      (cons :r4 (closest-standard-resistor r4)))
+	(list (cons :c1 (f-to-uf c1))
+	      (cons :c2 (f-to-uf c2))
+	      (cons :r1 r1)
+	      (cons :r2 r2)
+	      (cons :r3 (when (> k 1) r3))
+	      (cons :r4 r4)))))
 
 (defun arrl-high-pass-af-active-filter (this-stage total-stages
-					gain minus-3db-cutoff-freq)
-  "Calculate the component values for the simple Butterworth AF high-pass active filter in the ARRL handbook. If gain<=1, omit R3 and bypass R4. Figure 10.32 in the 2021 Handbook, similar in other editions."
+					gain minus-3db-cutoff-freq
+				       &optional (closest-real t))
+  "Calculate the component values for the simple Butterworth AF high-pass
+active filter in the ARRL handbook. If gain<=1, omit R3 and bypass
+R4. Defaults to returning commercially available resistor/capactor
+values. Figure 10.32 in the 2021 Handbook, similar in other editions."
   (let* ((k gain)
 	 (fc minus-3db-cutoff-freq)
 	 (wc (* 2 pi fc))
@@ -241,11 +256,17 @@
 	 (r4 (if (> k 1)
 		 (* k r1)
 		 0)))
-    (list (cons :c (closest-standard-capacitor (f-to-uf c)))
-	  (cons :r1 (closest-standard-resistor r1))
-	  (cons :r2 (closest-standard-resistor r2))
-	  (cons :r3 (when (> k 1) (closest-standard-resistor r3)))
-	  (cons :r4 (closest-standard-resistor r4)))))
+    (if closest-real
+	(list (cons :c (closest-standard-capacitor (f-to-uf c)))
+	      (cons :r1 (closest-standard-resistor r1))
+	      (cons :r2 (closest-standard-resistor r2))
+	      (cons :r3 (when (> k 1) (closest-standard-resistor r3)))
+	      (cons :r4 (closest-standard-resistor r4)))
+	(list (cons :c (f-to-uf c))
+	      (cons :r1 r1)
+	      (cons :r2 r2)
+	      (cons :r3 (when (> k 1) r3))
+	      (cons :r4 r4)))))
 
 ;;; Local Variables:
 ;;; mode: Lisp
